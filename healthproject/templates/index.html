@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+    <style>
+        table { width: 50%; margin: auto; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid black; text-align: center; }
+        input, select { width: 100%; padding: 5px; }
+        button { margin-top: 10px; width: 100%; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Add Patient</h2>
+    <form method="post" style="width: 50%; margin: auto;">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2 style="text-align:center;">Patient List</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+        </tr>
+        {% for patient in patients %}
+        <tr>
+            <td>{{ patient.name }}</td>
+            <td>{{ patient.age }}</td>
+            <td>{{ patient.get_gender_display }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{% url 'logout' %}">Logout</a>
+
+{% endblock %}
