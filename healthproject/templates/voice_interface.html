@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Voice STI Diagnosis{% endblock %}
+
+{% block content %}
+    <div class="container text-center mt-5">
+        <h2>Voice-Activated STI Diagnosis</h2>
+        <p>Click the button below to start the voice diagnosis.</p>
+        <button id="start-voice" class="btn btn-primary">Start Voice Diagnosis</button>
+        
+        <h3 class="mt-4">Predicted STI:</h3>
+        <div id="prediction-result" class="alert alert-info" role="alert">
+            No prediction yet
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("start-voice").addEventListener("click", function() {
+            fetch("{% url 'voice_sti_prediction' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.predicted_sti) {
+                    document.getElementById("prediction-result").innerHTML = `Predicted STI: <strong>${data.predicted_sti}</strong>`;
+                } else {
+                    document.getElementById("prediction-result").innerHTML = "Error: Could not get a prediction.";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("prediction-result").innerHTML = "An error occurred. Please try again.";
+            });
+        });
+    </script>
+{% endblock %}

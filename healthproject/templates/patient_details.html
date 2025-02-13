@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.name }}'s Details{% endblock %}
+
+{% block content %}
+    <h2>Patient Details</h2>
+    <p><strong>Name:</strong> {{ patient.name }}</p>
+    <p><strong>ID:</strong> {{ patient.id }}</p>
+    <p><strong>Age:</strong> {{ patient.age }}</p>
+    <p><strong>Medical History:</strong> {{ patient.medical_history }}</p>
+    <p><strong>Symptoms:</strong> <span id="current-symptoms">{{ patient.symptoms }}</span></p>
+
+    <h3>Update STI Symptoms</h3>
+    <form id="symptoms-form">
+        {% csrf_token %}
+
+        {% for symptom in sti_symptoms %}
+            <label class="switch">
+                <input type="checkbox" name="symptoms" value="{{ symptom }}">
+                <span class="slider round"></span>
+            </label> {{ symptom }} <br>
+        {% endfor %}
+
+        <button type="submit">Submit Symptoms</button>
+    </form>
+
+    <h3>Predicted STI:</h3>
+    <div id="PredictionResult" class="prediction-box">
+        <p class="placeholder">No prediction yet</p>
+    </div>
+
+    <a href="{% url 'diagnosis' %}">Back to Search</a>
+
+    <script>
+      document.getElementById("symptoms-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    // Collect selected symptoms
+    const symptoms = [];
+    const user = "{{ patient.id }}";  // Dynamically fetch patient ID
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+    checkboxes.forEach(checkbox => {
+        symptoms.push(checkbox.value);
+    });
+
+    // Fetch API to send symptoms for prediction
+    fetch('http://127.0.0.1:5000/predict_sti', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ symptoms, user }),
+    })
+    .then(response => response.json())
+    .then(result => {
+        const predictionResultElement = document.getElementById('PredictionResult');
+        predictionResultElement.innerHTML = `<h3>Prediction Results:</h3>`;
+
+        // Parse the received STI prediction string
+        let stiData = result.predicted_sti.split("\n").slice(1); // Remove the "STI_Type" header
+        
+        stiData.forEach(line => {
+            let parts = line.trim().split(/\s{2,}/); // Split using multiple spaces
+            if (parts.length === 2) {
+                let stiName = parts[0].trim();
+                let probability = parts[1].trim();
+
+                // Append structured results to the UI
+                predictionResultElement.innerHTML += `
+                    <div class="result-item">
+                        <span class="sti-name">${stiName}:</span> 
+                        <span class="sti-percentage">${probability}</span>
+                    </div>
+                `;
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+
+    </script>
+
+    <style>
+        /* Toggle Switch Styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #4CAF50; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Prediction Box Styling */
+        .prediction-box {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f4f4f4;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .sti-name {
+            font-weight: bold;
+        }
+
+        .sti-percentage {
+            color: #4CAF50;
+        }
+    </style>
+
+{% endblock %}

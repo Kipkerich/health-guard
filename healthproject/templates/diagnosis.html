@@ -4,5 +4,23 @@
 
 {% block content %}
     <h2>Diagnosis Page</h2>
-    <p>Enter patient details to begin diagnosis.</p>
+    <p>Search for a patient to begin diagnosis.</p>
+
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'diagnosis' %}">
+        <input type="text" name="q" placeholder="Search by name or ID" value="{{ request.GET.q }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Display Search Results -->
+    {% if patients %}
+        <h3>Search Results</h3>
+        <ul>
+            {% for patient in patients %}
+                <li><a href="{% url 'patient_detail' patient.id %}">{{ patient.name }} (ID: {{ patient.id }})</a></li>
+            {% endfor %}
+        </ul>
+    {% elif request.GET.q %}
+        <p>No results found for "{{ request.GET.q }}"</p>
+    {% endif %}
 {% endblock %}
