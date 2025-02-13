@@ -80,29 +80,49 @@ def update_patient_symptoms(request, patient_id):
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 def speak(text):
     engine = pyttsx3.init()
+    engine.setProperty('rate', 150)
     engine.say(text)
     engine.runAndWait()
 
 def recognize_speech():
+    """Ask user about STI symptoms using speech recognition."""
     recognizer = sr.Recognizer()
+    
     with sr.Microphone() as source:
+        recognizer.adjust_for_ambient_noise(source, duration=1)  # Reduce background noise
+        recognizer.energy_threshold = 300  # Tune sensitivity
+        
         speak("I will ask if you have certain symptoms. Please answer yes or no.")
+        print("I will ask if you have certain symptoms. Please answer yes or no.")
+        
         symptoms = []
         
         for symptom in STI_SYMPTOMS:
-            speak(f"Do you have {symptom.replace('_', ' ')}?")
-            print(f"Do you have {symptom.replace('_', ' ')}? (yes/no)")
-            try:
-                audio = recognizer.listen(source)
-                text = recognizer.recognize_google(audio).lower()
-                print(f"You said: {text}")
+            speak(f"Do you have {symptom}?")
+            print(f"Do you have {symptom}? (yes/no)")
+
+            for _ in range(3):  # Allow up to 3 attempts
+                try:
+                    audio = recognizer.listen(source, timeout=5)
+                    text = recognizer.recognize_google(audio).lower()
+                    print(f"You said: {text}")
+                    
+                    if text in ["yes", "no"]:
+                        if text == "yes":
+                            symptoms.append(symptom)
+                        break  # Move to the next symptom
+                    else:
+                        speak("Please answer yes or no.")
                 
-                if text == "yes":
-                    symptoms.append(symptom)
-            except sr.UnknownValueError:
-                speak("Sorry, I did not understand. Please repeat.")
-            except sr.RequestError:
-                speak("Could not request results, please check your internet connection.")
+                except sr.UnknownValueError:
+                    speak("Sorry, I did not understand. Please repeat.")
+                except sr.RequestError:
+                    speak("Could not request results. Please check your internet connection.")
+                    return []
+                
+        speak("Thank you. Your symptoms have been recorded.")
+        print("Symptoms recorded:", symptoms)
+        
     return symptoms
 
 def predict_sti(symptoms):
