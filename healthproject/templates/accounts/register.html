@@ -2,24 +2,33 @@
 
 {% block content %}
     <div class="container mt-5">
-        <h2 class="text-center mb-4">Register</h2>
+        <h2 class="text-center mb-4">Registration Form</h2>
         
-        <!-- Form Container for better alignment -->
-        <div class="form-container">
-            <form method="post">
-                {% csrf_token %}
-                
-                <!-- Form Fields -->
-                <div class="form-group">
-                    {{ form.as_p }}
-                </div>
+        <!-- Form Card -->
+        <div class="d-flex justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h4>Enter Your Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <!-- Form Fields -->
+                            <div class="form-group">
+                                {{ form.as_p }}
+                            </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary btn-block">Register</button>
-            </form>
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-block">Register</button>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <p class="mt-2">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Login Link -->
-        <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login</a></p>
     </div>
 {% endblock %}

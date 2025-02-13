@@ -1,31 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh; background: linear-gradient(to bottom, #4e73df, #1cc88a);">
         <div class="col-md-4">
-            <h2>Login</h2>
+            <!-- Card Style for the form -->
+            <div class="card shadow-lg p-4" style="border-radius: 10px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <h2 class="text-center mb-4" style="color: #1cc88a;">Login</h2>
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ message }}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username" style="font-weight: bold;">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required placeholder="Enter your username">
                     </div>
-                {% endfor %}
-            {% endif %}
+                    <div class="form-group">
+                        <label for="password" style="font-weight: bold;">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="background-color: #4e73df; border-radius: 5px; font-size: 16px;">Login</button>
+                </form>
 
-            <form method="post">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-            </form>
-
-            <p>Don't have an account? <a href="{% url 'register' %}" class="btn btn-link">Register</a></p>
+                <p class="text-center mt-3">Don't have an account? <a href="{% url 'register' %}" class="btn btn-link" style="color: #1cc88a;">Register</a></p>
+            </div>
         </div>
     </div>
+
 {% endblock %}
