@@ -1,40 +1,110 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Health Guard{% endblock %}</title>
+    <meta name="description" content="Health Guard - A platform for managing patient details and diagnosis.">
+    <title>{% block title %} Health Guard {% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-        nav {
-            background-color: #333;
-            padding: 10px;
-            text-align: center;
+        /* Make sure the body and html have full height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
-        nav a {
+
+        /* Navbar fixed at the top */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 10px 0; /* You can adjust the padding for navbar height */
+        }
+
+        /* Content padding to prevent content from hiding behind the navbar */
+        body {
+            padding-top: 60px; /* Adjust according to navbar height */
+        }
+
+        /* Footer fixed at the bottom */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #343a40;
             color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
+            text-align: center;
+            padding: 10px 0;
         }
-        nav a:hover {
-            color: yellow;
+
+        /* Main content section to adjust height accordingly */
+        main {
+            min-height: 100vh; /* Ensure content takes at least the full height */
+            padding-bottom: 60px; /* Adjust to make space for the footer */
         }
+
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="{% url 'home' %}">Patient Details</a>
-        <a href="{% url 'diagnosis' %}">Diagnosis</a>
-        <a href="{% url 'register' %}">Register</a>
-        <a href="{% url 'login' %}">Login</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">Health Guard</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'home' %}">Patient Details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'diagnosis' %}">Diagnosis</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </nav>
 
-    <div>
-        {% block content %}
-        <!-- Page-specific content will go here -->
-        {% endblock %}
-    </div>
+    {% block content%}
+    
+    {% endblock %}
+    
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; {{ current_year }} Health Guard. All Rights Reserved.</p>
+        <p>
+            <a href="#" class="text-white">Privacy Policy</a> |
+            <a href="#" class="text-white">Terms of Service</a> |
+            <a href="#" class="text-white">Contact</a>
+        </p>
+    </footer>
 
+    <!-- Bootstrap JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>    
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

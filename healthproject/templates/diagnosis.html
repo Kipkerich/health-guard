@@ -3,24 +3,32 @@
 {% block title %}Diagnosis{% endblock %}
 
 {% block content %}
-    <h2>Diagnosis Page</h2>
-    <p>Search for a patient to begin diagnosis.</p>
+    <div class="container mt-5">
+        <h2 class="text-center">Diagnosis Page</h2>
+        <p class="text-center">Search for a patient to begin diagnosis.</p>
 
-    <!-- Search Form -->
-    <form method="GET" action="{% url 'diagnosis' %}">
-        <input type="text" name="q" placeholder="Search by name or ID" value="{{ request.GET.q }}">
-        <button type="submit">Search</button>
-    </form>
+        <!-- Search Form -->
+        <form method="GET" action="{% url 'diagnosis' %}" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search by name or ID" value="{{ request.GET.q }}">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
 
-    <!-- Display Search Results -->
-    {% if patients %}
-        <h3>Search Results</h3>
-        <ul>
-            {% for patient in patients %}
-                <li><a href="{% url 'patient_detail' patient.id %}">{{ patient.name }} (ID: {{ patient.id }})</a></li>
-            {% endfor %}
-        </ul>
-    {% elif request.GET.q %}
-        <p>No results found for "{{ request.GET.q }}"</p>
-    {% endif %}
+        <!-- Display Search Results -->
+        {% if patients %}
+            <h3>Search Results</h3>
+            <ul class="list-group">
+                {% for patient in patients %}
+                    <li class="list-group-item">
+                        <a href="{% url 'patient_detail' patient.id %}">{{ patient.name }} (ID: {{ patient.id }})</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% elif request.GET.q %}
+            <p>No results found for "{{ request.GET.q }}"</p>
+        {% endif %}
+    </div>
 {% endblock %}

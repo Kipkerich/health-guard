@@ -1,86 +1,93 @@
 {% extends "base.html" %}
 
-{% block title %}{{ patient.name }}'s Details{% endblock %}
+{% block title %}{{ patient.name }} Details{% endblock %}
 
 {% block content %}
-    <h2>Patient Details</h2>
-    <p><strong>Name:</strong> {{ patient.name }}</p>
-    <p><strong>ID:</strong> {{ patient.id }}</p>
-    <p><strong>Age:</strong> {{ patient.age }}</p>
-    <p><strong>Medical History:</strong> {{ patient.medical_history }}</p>
-    <p><strong>Symptoms:</strong> <span id="current-symptoms">{{ patient.symptoms }}</span></p>
+    <div class="container mt-5">
+        <h2 class="text-center">Patient Details</h2>
+        <p><strong>Name:</strong> {{ patient.name }}</p>
+        <p><strong>ID:</strong> {{ patient.id }}</p>
+        <p><strong>Age:</strong> {{ patient.age }}</p>
+        <p><strong>Gender:</strong> {{ patient.gender }}</p>
+        <h3>What symptoms does the patient have?</h3>
+        <form id="symptoms-form" class="mb-4">
+            {% csrf_token %}
+            <div class="form-group">
+                {% for symptom in sti_symptoms %}
+                    <label class="switch">
+                        <input type="checkbox" name="symptoms" value="{{ symptom }}">
+                        <span class="slider round"></span>
+                    </label> {{ symptom }} <br>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit </button>
+        </form>
 
-    <h3>Update STI Symptoms</h3>
-    <form id="symptoms-form">
-        {% csrf_token %}
+        <h3>Predicted STI:</h3>
+        <div id="PredictionResult" class="prediction-box">
+            <p class="placeholder">No prediction yet</p>
+        </div>
 
-        {% for symptom in sti_symptoms %}
-            <label class="switch">
-                <input type="checkbox" name="symptoms" value="{{ symptom }}">
-                <span class="slider round"></span>
-            </label> {{ symptom }} <br>
-        {% endfor %}
+        <a href="{% url 'diagnosis' %}" class="btn btn-link">Back to Search</a>
 
-        <button type="submit">Submit Symptoms</button>
-    </form>
-
-    <h3>Predicted STI:</h3>
-    <div id="PredictionResult" class="prediction-box">
-        <p class="placeholder">No prediction yet</p>
     </div>
-
-    <a href="{% url 'diagnosis' %}">Back to Search</a>
 
     <script>
       document.getElementById("symptoms-form").addEventListener("submit", function(event) {
-    event.preventDefault();
+        event.preventDefault();
 
-    // Collect selected symptoms
-    const symptoms = [];
-    const user = "{{ patient.id }}";  // Dynamically fetch patient ID
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        // Collect selected symptoms
+        const symptoms = [];
+        const user = "{{ patient.id }}";  // Dynamically fetch patient ID
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
 
-    checkboxes.forEach(checkbox => {
-        symptoms.push(checkbox.value);
-    });
-
-    // Fetch API to send symptoms for prediction
-    fetch('http://127.0.0.1:5000/predict_sti', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ symptoms, user }),
-    })
-    .then(response => response.json())
-    .then(result => {
-        const predictionResultElement = document.getElementById('PredictionResult');
-        predictionResultElement.innerHTML = `<h3>Prediction Results:</h3>`;
-
-        // Parse the received STI prediction string
-        let stiData = result.predicted_sti.split("\n").slice(1); // Remove the "STI_Type" header
-        
-        stiData.forEach(line => {
-            let parts = line.trim().split(/\s{2,}/); // Split using multiple spaces
-            if (parts.length === 2) {
-                let stiName = parts[0].trim();
-                let probability = parts[1].trim();
-
-                // Append structured results to the UI
-                predictionResultElement.innerHTML += `
-                    <div class="result-item">
-                        <span class="sti-name">${stiName}:</span> 
-                        <span class="sti-percentage">${probability}</span>
-                    </div>
-                `;
-            }
+        checkboxes.forEach(checkbox => {
+            symptoms.push(checkbox.value);
         });
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
 
+        // Disable checkboxes after submission to avoid re-submission
+        checkboxes.forEach(checkbox => {
+            checkbox.disabled = true;
+        });
+
+        // Fetch API to send symptoms for prediction
+        fetch('http://127.0.0.1:5000/predict_sti', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ symptoms, user }),
+        })
+        .then(response => response.json())
+        .then(result => {
+            const predictionResultElement = document.getElementById('PredictionResult');
+            predictionResultElement.innerHTML = `<h3>Prediction Results:</h3>`;
+
+            // Parse the received STI prediction string
+            let stiData = result.predicted_sti.split("\n").slice(1); // Remove the "STI_Type" header
+            
+            stiData.forEach(line => {
+                let parts = line.trim().split(/\s{2,}/); // Split using multiple spaces
+                if (parts.length === 2) {
+                    let stiName = parts[0].trim();
+                    let probability = parts[1].trim();
+
+                    // Append structured results to the UI
+                    predictionResultElement.innerHTML += `
+                        <div class="result-item">
+                            <span class="sti-name">${stiName}:</span> 
+                            <span class="sti-percentage">${probability}</span>
+                        </div>
+                    `;
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const predictionResultElement = document.getElementById('PredictionResult');
+            predictionResultElement.innerHTML = `<p style="color: red;">Error fetching prediction. Please try again later.</p>`;
+        });
+    });
     </script>
 
     <style>
@@ -145,6 +152,10 @@
 
         .sti-percentage {
             color: #4CAF50;
+        }
+
+        .placeholder {
+            color: #888;
         }
     </style>
 
