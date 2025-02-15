@@ -1,0 +1,11 @@
+painful_urination,abnormal_discharge,pain_during_sex,abdominal_pain','abnormal_bleeding_women,sore_throat,swelling_testicles,rash_palms_soles,flu_like_symptoms,genital_warts,STI_Type
+1,0,1,0,1,0,0,0,1,0,Chlamydia
+0,1,1,1,0,0,0,1,0,0,Gonorrhea
+1,1,1,0,1,1,0,1,1,1,Syphilis
+0,0,0,1,0,1,1,0,0,0,Herpes
+1,0,0,0,0,0,0,0,1,0,HIV
+0,1,0,1,1,0,0,1,0,0,HPV
+1,1,1,1,0,0,1,0,1,1,Chlamydia
+0,0,0,0,1,1,0,0,0,0,Unknown
+1,0,0,1,0,1,0,0,1,0,Herpes
+0,1,1,0,1,0,1,1,0,0,Gonorrhea

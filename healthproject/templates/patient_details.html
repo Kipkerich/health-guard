@@ -47,6 +47,9 @@
             <div class="card-header text-center">
                 <h3>Predicted STI:</h3>
             </div>
+            <div id="model_prediction" class="card-body prediction-box">
+Model Prediction:
+                </div>
             <div id="PredictionResult" class="card-body prediction-box">
                 <p class="placeholder">No prediction yet</p>
             </div>
@@ -84,11 +87,13 @@
             .then(response => response.json())
             .then(result => {
                 const predictionResultElement = document.getElementById('PredictionResult');
+                const model_prediction=document.getElementById("model_prediction");
                 predictionResultElement.innerHTML = `<h3>Prediction Results:</h3>`;
 
                 // Parse the received STI prediction string
                 let stiData = result.predicted_sti.split("\n").slice(1); // Remove the "STI_Type" header
-                
+                model_prediction.innerHTML+
+                =result.model_prediction;
                 stiData.forEach(line => {
                     let parts = line.trim().split(/\s{2,}/); // Split using multiple spaces
                     if (parts.length === 2) {
